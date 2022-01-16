@@ -5,7 +5,7 @@ const {hideBin} = require('yargs/helpers')
 const createReleaseCmd = require("../commands/create-release")
 
 yargs(hideBin(process.argv))
-    .command('$0 <release>',
+    .command('$0',
         "Creates a new release for your Expo app and updates config versions",
         () => {},
         createReleaseCmd
@@ -20,4 +20,5 @@ yargs(hideBin(process.argv))
         type: "boolean",
         description: "Run with verbose logging"
     })
+    .demandOption(["release"])
     .parse()

@@ -5,6 +5,14 @@ const createReleaseCmd = require("../commands/create-release")
 const TMP_DIR = path.join(__dirname, "/.tmp")
 const FIXTURES_DIR = path.join(__dirname, "/fixtures")
 
+// jest.mock('simple-git', () => () => {
+//     return {
+//         commit: jest.fn(),
+//         tag: jest.fn(),
+//         push: jest.fn(),
+//     }
+// })
+
 const cleanTmpFiles = async () => {
     await rm(TMP_DIR, {recursive: true, force: true})
     await mkdir(TMP_DIR)
@@ -15,6 +23,7 @@ beforeEach(async () => {
 })
 
 afterAll(async () => {
+    // jest.resetAllMocks()
     await cleanTmpFiles()
 })
 
@@ -85,6 +94,7 @@ it("updates an eas.json", async () => {
             prod: {releaseChannel: "prod-1.1.0"}
         },
     })
+    // expect(gitMock.status).toBeCalled()
 })
 
 it("updates a package.json", async () => {
@@ -128,7 +138,7 @@ it("updates all files", async () => {
     await assertPackageJson({version: "1.1.0"})
 })
 
-it("throws an error for an valid semver version", async () => {
+it("throws an error for an invalid semver version", async () => {
     const appConfigPath = await useFixture("app.config.js")
     const easJsonPath = await useFixture("eas.json")
     const packageJsonPath = await useFixture("package.json")

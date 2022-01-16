@@ -1,9 +1,11 @@
 const path = require("path")
 const replaceInFile = require("replace-in-file")
 const cwd = process.cwd()
+const simpleGit = require('simple-git')
 
 // https://regexr.com/39s32
 const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
+const git = simpleGit()
 const DEFAULT_APP_CONFIG_PATH = path.resolve(cwd, "./app.config.js")
 const DEFAULT_EAS_JSON_PATH = path.resolve(cwd, "./eas.json")
 const DEFAULT_PACKAGE_JSON_PATH = path.resolve(cwd, "./package.json")
@@ -16,16 +18,21 @@ function run(args) {
     const currentAppConfigPath = args.appConfigPath || DEFAULT_APP_CONFIG_PATH
     const currentAppConfig = require(currentAppConfigPath)
 
-    validateStep(args)
-    updatePackageStep(args, currentAppConfig)
-    updateAppConfigStep(args, currentAppConfig, currentAppConfigPath)
-    updateReleaseChannelsStep(args, currentAppConfig)
+    return validateStep(args)
+        .then(() => updatePackageStep(args, currentAppConfig))
+        .then(() => updateAppConfigStep(args, currentAppConfig, currentAppConfigPath))
+        .then(() => updateReleaseChannelsStep(args, currentAppConfig))
+        .catch((e) =>{
+            console.error(e)
+            process.exit(1)
+        })
 }
 
 /**
  * Validate the command params and project setup before executing further
  *
  * @param {Object} args Command line arguments
+ * @return {Promise<void>}
  */
 function validateStep(args) {
     const {release} = args
@@ -33,7 +40,15 @@ function validateStep(args) {
         throw new Error(`Invalid app version: '${release}'. Please follow https://semver.org/`, )
     }
 
-    // TODO: cannot go back in semver
+    // TODO: validate clean git workspace
+    // git.status(function(err, statusSummary) {
+    //     if (statusSummary.modified.length > 0) {
+            // TODO: throw error. please clean commit all changes be running a release
+        // }
+    // })
+    // TODO: validate cannot go back in semver
+
+    return Promise.resolve()
 }
 
 /**
@@ -41,12 +56,15 @@ function validateStep(args) {
  *
  * @param {Object} args Command line arguments
  * @param {Object} appConfig The current expo app.config.js file content
+ * @return {Promise<void>}
  */
 function updatePackageStep(args, appConfig) {
     const {release} = args
 
     const packageJsonPath = args.packageJsonPath || DEFAULT_PACKAGE_JSON_PATH
     __replace(packageJsonPath, `"version": "${appConfig.version}"`, `"version": "${release}"`)
+
+    return Promise.resolve()
 }
 
 /**
@@ -55,6 +73,7 @@ function updatePackageStep(args, appConfig) {
  * @param {Object} args The command line arguments
  * @param {Object} appConfig The current expo app.config.js file content
  * @param {String} appConfigPath The current expo app.config.js file path
+ * @return {Promise<void>}
  */
 function updateAppConfigStep(args, appConfig, appConfigPath) {
     const {release} = args
@@ -68,6 +87,8 @@ function updateAppConfigStep(args, appConfig, appConfigPath) {
     // Android version code
     const androidVersionCode = appConfig.android.versionCode
     __replace(appConfigPath, `versionCode: ${androidVersionCode}`, `versionCode: ${androidVersionCode + 1}`)
+
+    return Promise.resolve()
 }
 
 /**
@@ -75,6 +96,7 @@ function updateAppConfigStep(args, appConfig, appConfigPath) {
  *
  * @param {Object} args The command line arguments
  * @param {Object} appConfig The current expo app.config.js file content
+ * @return {Promise<void>}
  */
 function updateReleaseChannelsStep(args, appConfig) {
     const {release} = args
@@ -82,16 +104,13 @@ function updateReleaseChannelsStep(args, appConfig) {
 
     __replace(easPath, `staging-${appConfig.version}`, `staging-${release}`)
     __replace(easPath, `prod-${appConfig.version}`, `prod-${release}`)
+
+    return Promise.resolve()
 }
 
 // Replace content in a file on disk
 function __replace(path, from, to) {
-    try {
-        replaceInFile.sync({files: path, from, to})
-    } catch (e) {
-        console.error(e)
-        process.exit(1)
-    }
+    replaceInFile.sync({files: path, from, to})
 }
 
 // TODO: it would nice to display some before and after version changes in verbose mode
