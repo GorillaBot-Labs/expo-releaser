@@ -1,10 +1,18 @@
 import {readFile} from "fs/promises";
 
+/**
+ * Assert that our command ran successfully
+ * @return {Promise<void>}
+ */
 export const assertSuccess = async () => {
     expect(process.exit).toBeCalledWith(0)
     expect(console.error).not.toBeCalled()
 }
 
+/**
+ * Assert that our command failed to run and some errors
+ * @return {Promise<void>}
+ */
 export const assertFailed = async (errorMessages) => {
     expect(process.exit).toBeCalledWith(1)
     errorMessages.forEach((message) => {
@@ -13,7 +21,6 @@ export const assertFailed = async (errorMessages) => {
 }
 
 export const assertAppConfig = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
     const buffer = await readFile(`${process.env.__TMP_DIR__}/app.config.js`)
     const config = eval(buffer.toString())
 
@@ -23,7 +30,6 @@ export const assertAppConfig = async (expectations) => {
 }
 
 export const assertEasJson = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
     const buffer = await readFile(`${process.env.__TMP_DIR__}/eas.json`)
     const json = JSON.parse(buffer.toString())
 
@@ -32,7 +38,6 @@ export const assertEasJson = async (expectations) => {
 }
 
 export const assertPackageJson = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
     const buffer = await readFile(`${process.env.__TMP_DIR__}/package.json`)
     const json = JSON.parse(buffer.toString())
 
