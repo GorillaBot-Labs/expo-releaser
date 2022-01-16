@@ -1,0 +1,19 @@
+{
+  "name": "expo-releaser",
+  "version": "1.0.0",
+  "description": "A simple cli to update your expo configurations for a new release",
+  "main": "index.js",
+  "bin": {
+    "expo-releaser": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "John Rake",
+  "license": "ISC",
+  "dependencies": {
+    "meow": "^10.1.2",
+    "replace-in-file": "^6.3.2"
+  }
+}
