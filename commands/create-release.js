@@ -30,7 +30,7 @@ function run(args) {
 function validateStep(args) {
     const {releaseVersion} = args
     if (!releaseVersion.match(semverRegex)) {
-        throw new Error(`Invalid app version: '${semverRegex}'. Please follow https://semver.org/`, )
+        throw new Error(`Invalid app version: '${releaseVersion}'. Please follow https://semver.org/`, )
     }
 
     // TODO: cannot go back in semver

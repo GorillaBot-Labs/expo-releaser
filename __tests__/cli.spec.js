@@ -139,7 +139,8 @@ it("throws an error for an valid semver version", async () => {
         easJsonPath,
         packageJsonPath,
     }
-    expect(() => createReleaseCmd(args)).toThrow()
+    expect(() => createReleaseCmd(args))
+        .toThrow("Invalid app version: 'bad-version'. Please follow https://semver.org/")
 
     await assertAppConfig({
         version: "1.0.0",
