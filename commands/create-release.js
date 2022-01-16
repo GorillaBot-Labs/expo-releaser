@@ -1,11 +1,8 @@
 const path = require("path")
 const replaceInFile = require("replace-in-file")
+const git = require("../helpers/git");
 const cwd = process.cwd()
-const simpleGit = require('simple-git')
 
-// https://regexr.com/39s32
-const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
-const git = simpleGit()
 const DEFAULT_APP_CONFIG_PATH = path.resolve(cwd, "./app.config.js")
 const DEFAULT_EAS_JSON_PATH = path.resolve(cwd, "./eas.json")
 const DEFAULT_PACKAGE_JSON_PATH = path.resolve(cwd, "./package.json")
@@ -18,12 +15,13 @@ function run(args) {
     const currentAppConfigPath = args.appConfigPath || DEFAULT_APP_CONFIG_PATH
     const currentAppConfig = require(currentAppConfigPath)
 
-    return validateStep(args)
+    return validateReleaseStep(args)
+        .then(() => validateGitStatusStep())
         .then(() => updatePackageStep(args, currentAppConfig))
         .then(() => updateAppConfigStep(args, currentAppConfig, currentAppConfigPath))
         .then(() => updateReleaseChannelsStep(args, currentAppConfig))
-        .catch((e) =>{
-            console.error(e)
+        .catch((e) => {
+            console.error(e.message)
             process.exit(1)
         })
 }
@@ -32,23 +30,44 @@ function run(args) {
  * Validate the command params and project setup before executing further
  *
  * @param {Object} args Command line arguments
- * @return {Promise<void>}
+ * @return {Promise}
  */
-function validateStep(args) {
-    const {release} = args
-    if (!release.match(semverRegex)) {
-        throw new Error(`Invalid app version: '${release}'. Please follow https://semver.org/`, )
-    }
+function validateReleaseStep(args) {
+    return new Promise((resolve, reject) => {
+        const {release} = args
 
-    // TODO: validate clean git workspace
-    // git.status(function(err, statusSummary) {
-    //     if (statusSummary.modified.length > 0) {
-            // TODO: throw error. please clean commit all changes be running a release
-        // }
-    // })
-    // TODO: validate cannot go back in semver
+        // https://regexr.com/39s32
+        const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
+        if (!release.match(semverRegex)) {
+            return reject(new Error(`Invalid app version: '${release}'. Please follow https://semver.org/`))
+        }
 
-    return Promise.resolve()
+
+        // TODO: validate cannot go back in semver
+
+        return resolve()
+    })
+}
+
+/**
+ * @return {Promise}
+ */
+function validateGitStatusStep() {
+    return new Promise((resolve, reject) => {
+        git.status(function (err, statusSummary) {
+            if (err) return reject(err)
+
+            const {modified} = statusSummary
+
+            if (modified.length > 0) {
+                console.error("You have git working changes. Please resolve the following files before continuing.")
+                console.error(modified)
+                return reject(new Error("Invalid git workspace"))
+            }
+
+            return resolve()
+        })
+    })
 }
 
 /**
