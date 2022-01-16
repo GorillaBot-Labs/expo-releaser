@@ -7,46 +7,31 @@ const cwd = process.cwd()
 // https://regexr.com/39s32
 const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
 const DEFAULT_APP_CONFIG_PATH = path.resolve(cwd, "./app.config.js")
+const DEFAULT_EAS_JSON_PATH = path.resolve(cwd, "./eas.json")
+const DEFAULT_PACKAGE_JSON_PATH = path.resolve(cwd, "./package.json")
 
 function main(args) {
     const {releaseVersion, verbose} = args
-    const packageJsonPath = path.resolve(cwd, "./package.json")
     const appConfigPath = args.appConfigPath || DEFAULT_APP_CONFIG_PATH
-    const easConfigPath = path.resolve(cwd, "./eas.json")
-
     const appConfig = require(appConfigPath)
-    let easJSON = null
-    let packageJSON = null
-
-    try {
-        if (fs.existsSync(easConfigPath)) {
-            easJSON = JSON.parse(fs.readFileSync(easConfigPath).toString())
-        }
-
-        if (fs.existsSync(packageJsonPath)) {
-            packageJSON = JSON.parse(fs.readFileSync(packageJsonPath).toString())
-        }
-    } catch (e) {
-    }
 
     if (!releaseVersion.match(semverRegex)) {
         console.error("Invalid app version:", releaseVersion)
     }
 
-    if (packageJSON) {
-        updatePackageJsonVersion(releaseVersion)
-    }
-
-    updateAppVersions(releaseVersion)
-    updateReleaseChannelVersions(releaseVersion)
+    updatePackageJsonVersion()
+    updateAppVersions()
+    updateReleaseChannelVersions()
 
     // Write version updates to app.config.js
-    function updatePackageJsonVersion(newAppVersion) {
+    function updatePackageJsonVersion() {
+        const packageJsonPath = args.packageJsonPath || DEFAULT_PACKAGE_JSON_PATH
+
         try {
             replace.sync({
                 files: packageJsonPath,
                 from: `"version": "${appConfig.version}"`,
-                to: `"version": "${newAppVersion}"`,
+                to: `"version": "${releaseVersion}"`,
             })
             // console.log("package.json saved!")
         } catch (e) {
@@ -56,13 +41,13 @@ function main(args) {
     }
 
     // Write version updates to app.config.js
-    function updateAppVersions(newAppVersion) {
+    function updateAppVersions() {
         try {
             // App version
             replace.sync({
                 files: appConfigPath,
                 from: `version: "${appConfig.version}"`,
-                to: `version: "${newAppVersion}"`,
+                to: `version: "${releaseVersion}"`,
             })
 
             // Apple build number
@@ -88,17 +73,19 @@ function main(args) {
     }
 
     // Write version updates to eas.json
-    function updateReleaseChannelVersions(newAppVersion) {
+    function updateReleaseChannelVersions() {
+        const easPath = args.easJsonPath || DEFAULT_EAS_JSON_PATH
+
         try {
             replace.sync({
-                files: easConfigPath,
+                files: easPath,
                 from: `staging-${appConfig.version}`,
-                to: `staging-${newAppVersion}`,
+                to: `staging-${releaseVersion}`,
             })
             replace.sync({
-                files: easConfigPath,
+                files: easPath,
                 from: `prod-${appConfig.version}`,
-                to: `prod-${newAppVersion}`,
+                to: `prod-${releaseVersion}`,
             })
             // console.log("eas.json saved!");
         } catch (e) {

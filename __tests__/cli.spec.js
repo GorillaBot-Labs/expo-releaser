@@ -6,7 +6,7 @@ const TMP_DIR = path.join(__dirname, "/.tmp")
 const FIXTURES_DIR = path.join(__dirname, "/fixtures")
 
 const cleanTmpFiles = async () => {
-    await rm(TMP_DIR, { recursive: true, force: true })
+    await rm(TMP_DIR, {recursive: true, force: true})
     await mkdir(TMP_DIR)
 }
 
@@ -25,9 +25,9 @@ const useFixture = async (name) => {
     return dest
 }
 
-const assertAppConfig = async (fixtureName, expectations) => {
+const assertAppConfig = async (expectations) => {
     // TODO: figure out why we can't just require() here.
-    const buffer = await readFile(`${TMP_DIR}/${fixtureName}`)
+    const buffer = await readFile(`${TMP_DIR}/app.config.js`)
     const config = eval(buffer.toString())
 
     expect(config.version).toBe(expectations.version)
@@ -35,16 +35,37 @@ const assertAppConfig = async (fixtureName, expectations) => {
     expect(config.android.versionCode).toBe(expectations.android.versionCode)
 }
 
-it("updates a standard app.config.js", async () => {
+const assertEasJson = async (expectations) => {
+    // TODO: figure out why we can't just require() here.
+    const buffer = await readFile(`${TMP_DIR}/eas.json`)
+    const json = JSON.parse(buffer.toString())
+
+    expect(json.build.staging.releaseChannel).toBe(expectations.build.staging.releaseChannel)
+    expect(json.build.prod.releaseChannel).toBe(expectations.build.prod.releaseChannel)
+}
+
+const assertPackageJson = async (expectations) => {
+    // TODO: figure out why we can't just require() here.
+    const buffer = await readFile(`${TMP_DIR}/package.json`)
+    const json = JSON.parse(buffer.toString())
+
+    expect(json.version).toBe(expectations.version)
+}
+
+it("updates a standard setup", async () => {
     const appConfigPath = await useFixture("app.config.js")
+    const easJsonPath = await useFixture("eas.json")
+    const packageJsonPath = await useFixture("package.json")
 
     const args = {
         releaseVersion: "1.1.0",
-        appConfigPath
+        appConfigPath,
+        easJsonPath,
+        packageJsonPath,
     }
     createReleaseCmd(args)
 
-    await assertAppConfig("app.config.js", {
+    await assertAppConfig({
         version: "1.1.0",
         ios: {
             buildNumber: "2",
@@ -53,4 +74,18 @@ it("updates a standard app.config.js", async () => {
             versionCode: 2,
         }
     })
+    await assertEasJson( {
+        build: {
+            staging: {
+                releaseChannel: "staging-1.1.0",
+            },
+            prod: {
+                releaseChannel: "prod-1.1.0",
+            }
+        },
+    })
+    await assertPackageJson({
+        version: "1.1.0",
+    })
 })
+

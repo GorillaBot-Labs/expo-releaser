@@ -32,7 +32,8 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "__tests__/fixtures", "__tests/.tmp"
+      "__tests__/fixtures/",
+      "__tests__/.tmp/"
     ]
   }
 }
