@@ -32,8 +32,10 @@
     "jest": "^27.4.7"
   },
   "jest": {
+    "globalSetup": "./test-setup.js",
     "testPathIgnorePatterns": [
-      "__tests__/fixtures/",
+      "__tests__/__fixtures__/",
+      "__tests__/__utils__/",
       "__tests__/.tmp/"
     ]
   }

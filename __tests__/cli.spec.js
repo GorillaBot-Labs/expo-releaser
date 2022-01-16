@@ -1,19 +1,12 @@
-const path = require("path")
-const {readFile, copyFile, rm, mkdir} = require("fs/promises")
 const createReleaseCmd = require("../commands/create-release")
+const {cleanTmpFiles} = require("./__utils__/helpers");
+const {useFixture} = require("./__utils__/fixtures");
+const {assertAppConfig, assertPackageJson, assertEasJson} = require("./__utils__/assertions");
 const git = require("../helpers/git")
-
-const TMP_DIR = path.join(__dirname, "/.tmp")
-const FIXTURES_DIR = path.join(__dirname, "/fixtures")
 
 jest.mock("../helpers/git")
 console.error = jest.fn()
 process.exit = jest.fn()
-
-const cleanTmpFiles = async () => {
-    await rm(TMP_DIR, {recursive: true, force: true})
-    await mkdir(TMP_DIR)
-}
 
 beforeEach(async () => {
     await cleanTmpFiles()
@@ -25,40 +18,6 @@ afterAll(async () => {
     jest.resetAllMocks()
     await cleanTmpFiles()
 })
-
-const useFixture = async (name) => {
-    const src = `${FIXTURES_DIR}/${name}`
-    const dest = `${TMP_DIR}/${name}`
-    await copyFile(src, dest)
-    return dest
-}
-
-const assertAppConfig = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
-    const buffer = await readFile(`${TMP_DIR}/app.config.js`)
-    const config = eval(buffer.toString())
-
-    expect(config.version).toBe(expectations.version)
-    expect(config.ios.buildNumber).toBe(expectations.ios.buildNumber)
-    expect(config.android.versionCode).toBe(expectations.android.versionCode)
-}
-
-const assertEasJson = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
-    const buffer = await readFile(`${TMP_DIR}/eas.json`)
-    const json = JSON.parse(buffer.toString())
-
-    expect(json.build.staging.releaseChannel).toBe(expectations.build.staging.releaseChannel)
-    expect(json.build.prod.releaseChannel).toBe(expectations.build.prod.releaseChannel)
-}
-
-const assertPackageJson = async (expectations) => {
-    // TODO: figure out why we can't just require() here.
-    const buffer = await readFile(`${TMP_DIR}/package.json`)
-    const json = JSON.parse(buffer.toString())
-
-    expect(json.version).toBe(expectations.version)
-}
 
 it("updates an app.config.js", async () => {
     const appConfigPath = await useFixture("app.config.js")
@@ -177,9 +136,8 @@ it("throws an error git workspace is not clean", async () => {
     const appConfigPath = await useFixture("app.config.js")
     const easJsonPath = await useFixture("eas.json")
     const packageJsonPath = await useFixture("package.json")
-    git.status = jest.fn((cb) => cb(null, {
-        modified: ["file.txt", "service.js", "README.md"]
-    }))
+    const modifiedFiles = ["file.txt", "service.js", "README.md"]
+    git.status = jest.fn((cb) => cb(null, {modified: modifiedFiles}))
 
     const args = {
         release: "1.1.0",
@@ -204,5 +162,5 @@ it("throws an error git workspace is not clean", async () => {
     expect(process.exit).toBeCalledWith(1)
     expect(console.error).toBeCalledWith("Invalid git workspace")
     expect(console.error).toBeCalledWith("You have git working changes. Please resolve the following files before continuing.")
-    expect(console.error).toBeCalledWith(["file.txt", "service.js", "README.md"])
+    expect(console.error).toBeCalledWith(modifiedFiles)
 })
