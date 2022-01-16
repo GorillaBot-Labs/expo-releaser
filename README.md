@@ -6,28 +6,13 @@ A simple cli to update your expo configurations for a new release
 
 Run the cli command - `expo-releaser`
 
-```
-➜  BloxApp git:(master) expo-releaser
-┌────────────────────┬─────────────────┐
-│      (index)       │     Values      │
-├────────────────────┼─────────────────┤
-│    App Version     │     '1.3.1'     │
-│  Staging Release   │ 'staging-1.3.1' │
-│ Production Release │  'prod-1.3.1'   │
-└────────────────────┴─────────────────┘
+<img width="479" alt="Screen Shot 2022-01-15 at 7 29 18 PM" src="https://user-images.githubusercontent.com/1700158/149643842-8d601f33-839d-4239-823a-252f93abee53.png">
 
-
-Looks the current app version is: 1.3.1
-What is the new app version you want to create? 1.3.2
-package.json saved!
-app.config.js saved!
-eas.json saved!
-```
 
 The command will save changes to your expo configuration files like so:
 
 **app.config.js**
-```
+```diff
 {
 -    version: "1.3.1",
 +    version: "1.3.2",
@@ -43,7 +28,7 @@ The command will save changes to your expo configuration files like so:
 ```
 
 **eas.json**
-```
+```diff
 {
   "build": {
      "staging": {
@@ -59,7 +44,7 @@ The command will save changes to your expo configuration files like so:
 ```
 
 **package.json**
-```
+```diff
 {
    "name": "my-app",
 -  "version": "1.3.1",
