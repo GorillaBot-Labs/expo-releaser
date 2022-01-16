@@ -127,3 +127,30 @@ it("updates all files", async () => {
     })
     await assertPackageJson({version: "1.1.0"})
 })
+
+it("throws an error for an valid semver version", async () => {
+    const appConfigPath = await useFixture("app.config.js")
+    const easJsonPath = await useFixture("eas.json")
+    const packageJsonPath = await useFixture("package.json")
+
+    const args = {
+        releaseVersion: "bad-version",
+        appConfigPath,
+        easJsonPath,
+        packageJsonPath,
+    }
+    expect(() => createReleaseCmd(args)).toThrow()
+
+    await assertAppConfig({
+        version: "1.0.0",
+        ios: {buildNumber: "1"},
+        android: {versionCode: 1}
+    })
+    await assertEasJson({
+        build: {
+            staging: {releaseChannel: "staging-1.0.0"},
+            prod: {releaseChannel: "prod-1.0.0"}
+        },
+    })
+    await assertPackageJson({version: "1.0.0"})
+})
