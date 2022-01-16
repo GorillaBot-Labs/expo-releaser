@@ -56,7 +56,7 @@ it("updates an app.config.js", async () => {
     const appConfigPath = await useFixture("app.config.js")
 
     const args = {
-        releaseVersion: "1.1.0",
+        release: "1.1.0",
         appConfigPath,
     }
     createReleaseCmd(args)
@@ -73,7 +73,7 @@ it("updates an eas.json", async () => {
     const easJsonPath = await useFixture("eas.json")
 
     const args = {
-        releaseVersion: "1.1.0",
+        release: "1.1.0",
         easJsonPath,
         appConfigPath,
     }
@@ -92,7 +92,7 @@ it("updates a package.json", async () => {
     const packageJsonPath = await useFixture("package.json")
 
     const args = {
-        releaseVersion: "1.1.0",
+        release: "1.1.0",
         packageJsonPath,
         appConfigPath,
     }
@@ -107,7 +107,7 @@ it("updates all files", async () => {
     const packageJsonPath = await useFixture("package.json")
 
     const args = {
-        releaseVersion: "1.1.0",
+        release: "1.1.0",
         appConfigPath,
         easJsonPath,
         packageJsonPath,
@@ -134,7 +134,7 @@ it("throws an error for an valid semver version", async () => {
     const packageJsonPath = await useFixture("package.json")
 
     const args = {
-        releaseVersion: "bad-version",
+        release: "bad-version",
         appConfigPath,
         easJsonPath,
         packageJsonPath,

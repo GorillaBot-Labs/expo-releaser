@@ -1,6 +1,6 @@
 {
   "name": "expo-releaser",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A simple cli to update your expo configurations for a new release",
   "main": "index.js",
   "bin": {

@@ -28,9 +28,9 @@ function run(args) {
  * @param {Object} args Command line arguments
  */
 function validateStep(args) {
-    const {releaseVersion} = args
-    if (!releaseVersion.match(semverRegex)) {
-        throw new Error(`Invalid app version: '${releaseVersion}'. Please follow https://semver.org/`, )
+    const {release} = args
+    if (!release.match(semverRegex)) {
+        throw new Error(`Invalid app version: '${release}'. Please follow https://semver.org/`, )
     }
 
     // TODO: cannot go back in semver
@@ -43,10 +43,10 @@ function validateStep(args) {
  * @param {Object} appConfig The current expo app.config.js file content
  */
 function updatePackageStep(args, appConfig) {
-    const {releaseVersion} = args
+    const {release} = args
 
     const packageJsonPath = args.packageJsonPath || DEFAULT_PACKAGE_JSON_PATH
-    __replace(packageJsonPath, `"version": "${appConfig.version}"`, `"version": "${releaseVersion}"`)
+    __replace(packageJsonPath, `"version": "${appConfig.version}"`, `"version": "${release}"`)
 }
 
 /**
@@ -57,9 +57,9 @@ function updatePackageStep(args, appConfig) {
  * @param {String} appConfigPath The current expo app.config.js file path
  */
 function updateAppConfigStep(args, appConfig, appConfigPath) {
-    const {releaseVersion} = args
+    const {release} = args
     // App version
-    __replace(appConfigPath, `version: "${appConfig.version}"`, `version: "${releaseVersion}"`)
+    __replace(appConfigPath, `version: "${appConfig.version}"`, `version: "${release}"`)
 
     // Apple build number
     const iosBuildNumber = appConfig.ios.buildNumber
@@ -77,11 +77,11 @@ function updateAppConfigStep(args, appConfig, appConfigPath) {
  * @param {Object} appConfig The current expo app.config.js file content
  */
 function updateReleaseChannelsStep(args, appConfig) {
-    const {releaseVersion} = args
+    const {release} = args
     const easPath = args.easJsonPath || DEFAULT_EAS_JSON_PATH
 
-    __replace(easPath, `staging-${appConfig.version}`, `staging-${releaseVersion}`)
-    __replace(easPath, `prod-${appConfig.version}`, `prod-${releaseVersion}`)
+    __replace(easPath, `staging-${appConfig.version}`, `staging-${release}`)
+    __replace(easPath, `prod-${appConfig.version}`, `prod-${release}`)
 }
 
 // Replace content in a file on disk
