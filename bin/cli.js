@@ -10,8 +10,6 @@ yargs(hideBin(process.argv))
         () => {},
         createReleaseCmd
     )
-    // TODO: appConfigPath option
-    // TODO: easJsonPath option
     .option("release-version", {
         type: "string",
         description: "The new release version in semver format (1.4.0, 2.3.0, 6.6.5, etc.)"
