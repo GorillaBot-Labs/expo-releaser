@@ -4,10 +4,7 @@ A simple cli to update your expo configurations for a new release
 
 ## Usage
 
-Run the cli command - `expo-releaser`
-
-<img width="479" alt="Screen Shot 2022-01-15 at 7 29 18 PM" src="https://user-images.githubusercontent.com/1700158/149643842-8d601f33-839d-4239-823a-252f93abee53.png">
-
+`expo-releaser 1.3.2`
 
 The command will save changes to your expo configuration files like so:
 
@@ -53,12 +50,6 @@ The command will save changes to your expo configuration files like so:
 ```
 
 Review the changes. If they look good then commit and begin your deployment workflow.
-
-### Future considerations
-
-- meow – Simple command-line helper.
-- chalk – Terminal string styling.
-- yargs – Command-line opt-string parser.
 
 ## License
 expo-releaser is Copyright © 2022 GorillaBot Labs, LLC. It is free software, and may be redistributed under 
