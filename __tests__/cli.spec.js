@@ -74,6 +74,8 @@ it("updates an app.config.js", async () => {
         ios: {buildNumber: "2"},
         android: {versionCode: 2}
     })
+    expect(process.exit).toBeCalledWith(0)
+    expect(console.error).not.toBeCalled()
 })
 
 it("updates an eas.json", async () => {
@@ -93,6 +95,8 @@ it("updates an eas.json", async () => {
             prod: {releaseChannel: "prod-1.1.0"}
         },
     })
+    expect(process.exit).toBeCalledWith(0)
+    expect(console.error).not.toBeCalled()
 })
 
 it("updates a package.json", async () => {
@@ -107,6 +111,8 @@ it("updates a package.json", async () => {
     await createReleaseCmd(args)
 
     await assertPackageJson({version: "1.1.0"})
+    expect(process.exit).toBeCalledWith(0)
+    expect(console.error).not.toBeCalled()
 })
 
 it("updates all files", async () => {
@@ -134,6 +140,8 @@ it("updates all files", async () => {
         },
     })
     await assertPackageJson({version: "1.1.0"})
+    expect(process.exit).toBeCalledWith(0)
+    expect(console.error).not.toBeCalled()
 })
 
 it("throws an error for an invalid semver version", async () => {

@@ -20,6 +20,9 @@ function run(args) {
         .then(() => updatePackageStep(args, currentAppConfig))
         .then(() => updateAppConfigStep(args, currentAppConfig, currentAppConfigPath))
         .then(() => updateReleaseChannelsStep(args, currentAppConfig))
+        .then(() => {
+            process.exit(0)
+        })
         .catch((e) => {
             console.error(e.message)
             process.exit(1)
