@@ -4,7 +4,7 @@ A simple cli to update your expo configurations for a new release
 
 ## Usage
 
-`expo-releaser 1.3.2`
+`expo-releaser -r 1.3.2`
 
 The command will save changes to your expo configuration files like so:
 
