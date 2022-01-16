@@ -1,7 +1,13 @@
 const createReleaseCmd = require("../commands/create-release")
 const {cleanTmpFiles} = require("./__utils__/helpers");
 const {useFixture} = require("./__utils__/fixtures");
-const {assertAppConfig, assertPackageJson, assertEasJson} = require("./__utils__/assertions");
+const {
+    assertAppConfig,
+    assertPackageJson,
+    assertEasJson,
+    assertSuccess,
+    assertFailed
+} = require("./__utils__/assertions");
 const git = require("../helpers/git")
 
 jest.mock("../helpers/git")
@@ -33,8 +39,7 @@ it("updates an app.config.js", async () => {
         ios: {buildNumber: "2"},
         android: {versionCode: 2}
     })
-    expect(process.exit).toBeCalledWith(0)
-    expect(console.error).not.toBeCalled()
+    await assertSuccess()
 })
 
 it("updates an eas.json", async () => {
@@ -54,8 +59,7 @@ it("updates an eas.json", async () => {
             prod: {releaseChannel: "prod-1.1.0"}
         },
     })
-    expect(process.exit).toBeCalledWith(0)
-    expect(console.error).not.toBeCalled()
+    await assertSuccess()
 })
 
 it("updates a package.json", async () => {
@@ -70,8 +74,7 @@ it("updates a package.json", async () => {
     await createReleaseCmd(args)
 
     await assertPackageJson({version: "1.1.0"})
-    expect(process.exit).toBeCalledWith(0)
-    expect(console.error).not.toBeCalled()
+    await assertSuccess()
 })
 
 it("updates all files", async () => {
@@ -99,8 +102,7 @@ it("updates all files", async () => {
         },
     })
     await assertPackageJson({version: "1.1.0"})
-    expect(process.exit).toBeCalledWith(0)
-    expect(console.error).not.toBeCalled()
+    await assertSuccess()
 })
 
 it("throws an error for an invalid semver version", async () => {
@@ -128,8 +130,9 @@ it("throws an error for an invalid semver version", async () => {
         },
     })
     await assertPackageJson({version: "1.0.0"})
-    expect(process.exit).toBeCalledWith(1)
-    expect(console.error).toBeCalledWith(`Invalid app version: 'bad-version'. Please follow https://semver.org/`)
+    await assertFailed([
+        "Invalid app version: 'bad-version'. Please follow https://semver.org/"
+    ])
 })
 
 it("throws an error git workspace is not clean", async () => {
@@ -159,8 +162,9 @@ it("throws an error git workspace is not clean", async () => {
         },
     })
     await assertPackageJson({version: "1.0.0"})
-    expect(process.exit).toBeCalledWith(1)
-    expect(console.error).toBeCalledWith("Invalid git workspace")
-    expect(console.error).toBeCalledWith("You have git working changes. Please resolve the following files before continuing.")
-    expect(console.error).toBeCalledWith(modifiedFiles)
+    await assertFailed([
+        "Invalid git workspace",
+        "You have git working changes. Please resolve the following files before continuing.",
+        modifiedFiles,
+    ])
 })
