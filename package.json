@@ -15,5 +15,8 @@
   "dependencies": {
     "meow": "^10.1.2",
     "replace-in-file": "^6.3.2"
+  },
+  "engines": {
+    "node": ">=14.16.0"
   }
 }

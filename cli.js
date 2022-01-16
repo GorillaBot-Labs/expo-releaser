@@ -2,15 +2,17 @@
 
 import meow from "meow"
 import path from "path"
+import readline from "readline"
 import replace from "replace-in-file"
+import { readFileSync } from 'fs'
 
-const packageJsonPath = path.resolve(__dirname, "../package.json")
-const appConfigPath = path.resolve(__dirname, "../app.config.js")
-const easConfigPath = path.resolve(__dirname, "../eas.json")
+const __dirname = process.cwd()
+const packageJsonPath = path.resolve(__dirname, "./package.json")
+const appConfigPath = path.resolve(__dirname, "./app.config.js")
+const easConfigPath = path.resolve(__dirname, "./eas.json")
+const appConfig = (await import(appConfigPath)).default
+const easJSON = JSON.parse(readFileSync(easConfigPath))
 
-const appConfig = require(appConfigPath)
-const easConfig = require(easConfigPath)
-const readline = require("readline")
 // https://regexr.com/39s32
 const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
 
@@ -20,11 +22,11 @@ askForNewVersion()
 function reportCurrentVersions() {
     console.table({
         "App Version": appConfig.version,
-        "Staging Release": easConfig.build.staging.releaseChannel,
-        "Production Release": easConfig.build.prod.releaseChannel,
+        "Staging Release": easJSON.build.staging.releaseChannel,
+        "Production Release": easJSON.build.prod.releaseChannel,
     })
     console.log("\n")
-    console.log("Looks the current app version is ", appConfig.version)
+    console.log("Looks the current app version is:", appConfig.version)
 }
 
 function askForNewVersion() {
