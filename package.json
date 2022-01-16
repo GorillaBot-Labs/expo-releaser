@@ -1,22 +1,38 @@
 {
   "name": "expo-releaser",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple cli to update your expo configurations for a new release",
   "main": "index.js",
   "bin": {
-    "expo-releaser": "./cli.js"
+    "expo-releaser": "./bin/cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
-  "type": "module",
   "author": "John Rake",
-  "license": "ISC",
+  "license": "MIT",
+  "keywords": [
+    "expo",
+    "semver",
+    "cli"
+  ],
   "dependencies": {
     "meow": "^10.1.2",
-    "replace-in-file": "^6.3.2"
+    "replace-in-file": "^6.3.2",
+    "yargs": "^17.3.1"
   },
   "engines": {
     "node": ">=14.16.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "babel-jest": "^27.4.6",
+    "jest": "^27.4.7"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "__tests__/fixtures", "__tests/.tmp"
+    ]
   }
 }
