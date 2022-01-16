@@ -67,25 +67,33 @@ it("updates a standard setup", async () => {
 
     await assertAppConfig({
         version: "1.1.0",
-        ios: {
-            buildNumber: "2",
-        },
-        android: {
-            versionCode: 2,
-        }
+        ios: {buildNumber: "2"},
+        android: {versionCode: 2}
     })
-    await assertEasJson( {
+    await assertEasJson({
         build: {
-            staging: {
-                releaseChannel: "staging-1.1.0",
-            },
-            prod: {
-                releaseChannel: "prod-1.1.0",
-            }
+            staging: {releaseChannel: "staging-1.1.0"},
+            prod: {releaseChannel: "prod-1.1.0"}
         },
     })
-    await assertPackageJson({
-        version: "1.1.0",
-    })
+    await assertPackageJson({version: "1.1.0"})
 })
 
+it("updates without an eas.json", async () => {
+    const appConfigPath = await useFixture("app.config.js")
+    const packageJsonPath = await useFixture("package.json")
+
+    const args = {
+        releaseVersion: "1.1.0",
+        appConfigPath,
+        packageJsonPath,
+    }
+    createReleaseCmd(args)
+
+    await assertAppConfig({
+        version: "1.1.0",
+        ios: {buildNumber: "2"},
+        android: {versionCode: 2}
+    })
+    await assertPackageJson({version: "1.1.0"})
+})

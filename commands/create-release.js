@@ -1,7 +1,5 @@
-const fs = require("fs")
 const path = require("path")
-const readline = require("readline")
-const replace = require("replace-in-file")
+const replaceInFile = require("replace-in-file")
 const cwd = process.cwd()
 
 // https://regexr.com/39s32
@@ -26,76 +24,41 @@ function main(args) {
     // Write version updates to app.config.js
     function updatePackageJsonVersion() {
         const packageJsonPath = args.packageJsonPath || DEFAULT_PACKAGE_JSON_PATH
-
-        try {
-            replace.sync({
-                files: packageJsonPath,
-                from: `"version": "${appConfig.version}"`,
-                to: `"version": "${releaseVersion}"`,
-            })
-            // console.log("package.json saved!")
-        } catch (e) {
-            reportError(e)
-        }
-
+        replace(packageJsonPath, `"version": "${appConfig.version}"`, `"version": "${releaseVersion}"`)
+        // console.log("package.json saved!")
     }
 
     // Write version updates to app.config.js
     function updateAppVersions() {
-        try {
-            // App version
-            replace.sync({
-                files: appConfigPath,
-                from: `version: "${appConfig.version}"`,
-                to: `version: "${releaseVersion}"`,
-            })
+        // App version
+        replace(appConfigPath, `version: "${appConfig.version}"`, `version: "${releaseVersion}"`)
 
-            // Apple build number
-            const iosBuildNumber = appConfig.ios.buildNumber
-            replace.sync({
-                files: appConfigPath,
-                from: `buildNumber: "${iosBuildNumber}"`,
-                to: `buildNumber: "${parseInt(iosBuildNumber) + 1}"`,
-            })
+        // Apple build number
+        const iosBuildNumber = appConfig.ios.buildNumber
+        replace(appConfigPath, `buildNumber: "${iosBuildNumber}"`, `buildNumber: "${parseInt(iosBuildNumber) + 1}"`)
 
-            // Android version code
-            const androidVersionCode = appConfig.android.versionCode
-            replace.sync({
-                files: appConfigPath,
-                from: `versionCode: ${androidVersionCode}`,
-                to: `versionCode: ${androidVersionCode + 1}`,
-            })
-            // console.log("app.config.js saved!");
-        } catch (e) {
-            reportError(e)
-        }
-
+        // Android version code
+        const androidVersionCode = appConfig.android.versionCode
+        replace(appConfigPath, `versionCode: ${androidVersionCode}`, `versionCode: ${androidVersionCode + 1}`)
+        // console.log("app.config.js saved!");
     }
 
     // Write version updates to eas.json
     function updateReleaseChannelVersions() {
         const easPath = args.easJsonPath || DEFAULT_EAS_JSON_PATH
 
-        try {
-            replace.sync({
-                files: easPath,
-                from: `staging-${appConfig.version}`,
-                to: `staging-${releaseVersion}`,
-            })
-            replace.sync({
-                files: easPath,
-                from: `prod-${appConfig.version}`,
-                to: `prod-${releaseVersion}`,
-            })
-            // console.log("eas.json saved!");
-        } catch (e) {
-            reportError(e)
-        }
+        replace(easPath, `staging-${appConfig.version}`, `staging-${releaseVersion}`)
+        replace(easPath, `prod-${appConfig.version}`, `prod-${releaseVersion}`)
+        // console.log("eas.json saved!");
     }
 
-    function reportError(error) {
-        console.error(error)
-        process.exit(1)
+    function replace(path, from, to) {
+        try {
+            replaceInFile.sync({files: path, from, to})
+        } catch (e) {
+            console.error(e)
+            process.exit(1)
+        }
     }
 
     // TODO: it would nice to display some before and after version changes in verbose mode
