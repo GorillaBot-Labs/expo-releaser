@@ -37,7 +37,7 @@ function run(args) {
  */
 function validateReleaseStep(args) {
     return new Promise((resolve, reject) => {
-        const {release} = args
+        const { release } = args
 
         // https://regexr.com/39s32
         const semverRegex = /^((([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)$/
@@ -60,7 +60,7 @@ function validateGitStatusStep() {
         git.status(function (err, statusSummary) {
             if (err) return reject(err)
 
-            const {modified} = statusSummary
+            const { modified } = statusSummary
 
             if (modified.length > 0) {
                 console.error("You have git working changes. Please resolve the following files before continuing.")
@@ -81,7 +81,7 @@ function validateGitStatusStep() {
  * @return {Promise<void>}
  */
 function updatePackageStep(args, appConfig) {
-    const {release} = args
+    const { release } = args
 
     const packageJsonPath = args.packageJsonPath || DEFAULT_PACKAGE_JSON_PATH
     __replace(packageJsonPath, `"version": "${appConfig.version}"`, `"version": "${release}"`)
@@ -98,7 +98,7 @@ function updatePackageStep(args, appConfig) {
  * @return {Promise<void>}
  */
 function updateAppConfigStep(args, appConfig, appConfigPath) {
-    const {release} = args
+    const { release } = args
     // App version
     __replace(appConfigPath, `version: "${appConfig.version}"`, `version: "${release}"`)
 
@@ -121,18 +121,20 @@ function updateAppConfigStep(args, appConfig, appConfigPath) {
  * @return {Promise<void>}
  */
 function updateReleaseChannelsStep(args, appConfig) {
-    const {release} = args
+    const { release, ignoreReleaseChannel } = args
     const easPath = args.easJsonPath || DEFAULT_EAS_JSON_PATH
 
-    __replace(easPath, `staging-${appConfig.version}`, `staging-${release}`)
-    __replace(easPath, `prod-${appConfig.version}`, `prod-${release}`)
+    if (!ignoreReleaseChannel) {
+        __replace(easPath, `staging-${appConfig.version}`, `staging-${release}`)
+        __replace(easPath, `production-${appConfig.version}`, `production-${release}`)
+    }
 
     return Promise.resolve()
 }
 
 // Replace content in a file on disk
 function __replace(path, from, to) {
-    replaceInFile.sync({files: path, from, to})
+    replaceInFile.sync({ files: path, from, to })
 }
 
 // TODO: it would nice to display some before and after version changes in verbose mode

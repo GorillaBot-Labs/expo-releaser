@@ -1,6 +1,6 @@
 # Expo Releaser
 
-A simple cli to update your expo configurations for a new release 
+A simple cli to update your expo configurations for a new release
 
 ## Usage
 
@@ -9,6 +9,7 @@ A simple cli to update your expo configurations for a new release
 The command will save changes to your expo configuration files like so:
 
 **app.config.js**
+
 ```diff
 {
 -    version: "1.3.1",
@@ -25,6 +26,7 @@ The command will save changes to your expo configuration files like so:
 ```
 
 **eas.json**
+
 ```diff
 {
   "build": {
@@ -32,15 +34,16 @@ The command will save changes to your expo configuration files like so:
 -      "releaseChannel": "staging-1.3.1",
 +      "releaseChannel": "staging-1.3.2",
      },
-     "prod": {
--      "releaseChannel": "prod-1.3.1",
-+      "releaseChannel": "prod-1.3.2",
+     "production": {
+-      "releaseChannel": "production-1.3.1",
++      "releaseChannel": "production-1.3.2",
      }
   }
 }
 ```
 
 **package.json**
+
 ```diff
 {
    "name": "my-app",
@@ -49,10 +52,15 @@ The command will save changes to your expo configuration files like so:
 }
 ```
 
+### Unversioned release channels
+
+If you want your release channels to simply be `staging` instead of `staging-1.3.1` or `production` instead of `production-1.3.1` you should pass the `-i` flag to ignore release channels in your updates
+
 Review the changes. If they look good then commit and begin your deployment workflow.
 
 ## License
-expo-releaser is Copyright © 2022 GorillaBot Labs, LLC. It is free software, and may be redistributed under 
+
+expo-releaser is Copyright © 2022 GorillaBot Labs, LLC. It is free software, and may be redistributed under
 the terms specified in the [LICENSE](/LICENSE.md) file.
 
 ## About GorillaBot Labs

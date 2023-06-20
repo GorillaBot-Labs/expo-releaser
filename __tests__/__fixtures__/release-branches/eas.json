@@ -11,13 +11,13 @@
       }
     },
     "staging": {
-      "releaseChannel": "staging-1.0.0",
+      "releaseChannel": "staging",
       "env": {
         "EXPO_ENV": "staging"
       }
     },
     "production": {
-      "releaseChannel": "production-1.0.0",
+      "releaseChannel": "production",
       "env": {
         "EXPO_ENV": "production"
       }

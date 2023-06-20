@@ -1,4 +1,4 @@
-import {readFile} from "fs/promises";
+import { readFile } from "fs/promises";
 
 /**
  * Assert that our command ran successfully
@@ -34,7 +34,7 @@ export const assertEasJson = async (expectations) => {
     const json = JSON.parse(buffer.toString())
 
     expect(json.build.staging.releaseChannel).toBe(expectations.build.staging.releaseChannel)
-    expect(json.build.prod.releaseChannel).toBe(expectations.build.prod.releaseChannel)
+    expect(json.build.production.releaseChannel).toBe(expectations.build.production.releaseChannel)
 }
 
 export const assertPackageJson = async (expectations) => {
